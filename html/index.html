@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>URL Shortener</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="scripts.js"></script>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+    </head>
+
+    <body>
+        <img src="edjurlogo.svg" alt="EDJURL Logo">
+        <div class="div-flex">
+            <div id="column-one">
+                <h1>Welcome to EDJURL</h1>
+                <p>A true edge-based, decentralized, URL shortener.</p>
+                <ul>
+                    <li>Easy link shortening</li>
+                    <li>Customize your short URL</li>
+                    <li>Secure your URL with a password for editing</li>
+                </ul>
+            </div>
+            <div id="column-two">
+                <div id="border"></div>
+                <div id="background-container">
+                    <h2>Shorten <span class="highlight">URL</span></h2>
+                    <div id="container">
+                        <input type="text" id="url" value="https://" placeholder="Enter URL" required>
+                        <div id="advanced" style="display: none;">
+                            <input type="text" id="alias" placeholder="Custom short string (optional)">
+                            <input type="text" id="password" placeholder="Password for edits (optional)">
+                            <input type="text" id="old_password" placeholder="Old password (optional)" style="display: none;">
+                            <button id="button-password" class="alternative" onclick="togglePasswordChange()">Change password</button>
+                        </div>
+                        <button id="button-advanced" class="alternative" onclick="toggleAdvanced()">Advanced</button>
+                        <button id="button-shorten" onclick="sendRequest()">Shorten</button>
+                    </div>
+                    <div id="container-result" style="display: none;">
+                        <div id="div-result-ok">
+                            <label for="result">Your Shortened URL</label>
+                            <input id="result" readonly>
+                        </div>
+                        <div id="div-result-error">
+                            <output id="error-message"></output>
+                        </div>
+                        <button id="button-back" onclick="goBack()">Go Back</button>
+                        <button id="button-copy-url" class="alternative" onclick="copyURL()">Copy URL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
