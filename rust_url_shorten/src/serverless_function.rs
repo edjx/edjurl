@@ -3,8 +3,37 @@ use edjx::{error, info, kv, HttpRequest, HttpResponse, StatusCode};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hasher;
 
+// "URL Shorten" serverless function.
+//
+// This function accepts a URL, stores it in the KV store, and returns a short
+// string (e.g., 6s4bxc5m) that can be used to retrieve the URL.
+//
+// Input: HTTP GET Request
+//   Query parameters:
+//   - 'url'          Long URL to be shortened.
+//   - 'alias'        (optional) Select a short string. If no alias is specified,
+//                    a unique hash value will be derived from the 'url' and
+//                    used instead.
+//   HTTP headers:
+//   - 'password'     (optional) Password that must be specified in order
+//                    to modify an existing short link. To change an existing
+//                    link, specify the existing short string as an 'alias'
+//                    query parameter, and the previously-set password in
+//                    the 'password' header.
+//   - 'old_password' (optional) In order to change an existing password,
+//                    specify the old password in the 'old_password' header
+//                    and the new password in the 'password' header.
+//
+// Output: HTTP Response
+//   On success:
+//   - HTTP response with a status 200 and a short string in the body.
+//   On failure:
+//   - HTTP response with a status other than 2xx and an error message
+//     in the body.
+//
+
 // Set the hash length, but low values introduce more collisions.
-// The actual length may get larger if there are too many records.
+// The actual length may get larger to avoid collisions.
 const DEFAULT_SHORTENED_LENGTH: usize = 8;
 
 const ALPHABET_SIZE: u16 = 36;
@@ -162,6 +191,8 @@ pub fn serverless(req: HttpRequest) -> HttpResponse {
         }
     };
 
+    // If a key doesn't exist, it can be created.
+    // If the key exists, the value can be modified only with the correct password.
     if key_available(&shortened) || authenticate(&shortened, &old_password) {
         let val = serialize_value(&Value { url, password });
         match kv::put(&shortened, val, None) {
@@ -170,8 +201,14 @@ pub fn serverless(req: HttpRequest) -> HttpResponse {
         }
     } else {
         match &alias {
-            Some(_) => HttpResponse::from("Requested alias is already taken and your password doesn't grant you a permission to change it").set_status(StatusCode::FORBIDDEN),
-            None => HttpResponse::from("Generated short string already exists").set_status(StatusCode::INTERNAL_SERVER_ERROR)
+            Some(_) => HttpResponse::from(
+                    "Requested alias is already taken and your password doesn't grant you a permission to change it"
+                )
+                .set_status(StatusCode::FORBIDDEN),
+            None => HttpResponse::from(
+                    "Generated short string already exists"
+                )
+                .set_status(StatusCode::INTERNAL_SERVER_ERROR),
         }
     }
 }

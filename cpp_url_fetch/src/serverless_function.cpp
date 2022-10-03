@@ -19,6 +19,24 @@ using edjx::response::HttpResponse;
 using edjx::error::KVError;
 using edjx::http::HttpStatusCode;
 
+// "URL Fetch" serverless function.
+//
+// This function accepts a short string (e.g., 6s4bxc5m) that was generated
+// by the "URL Shorten" function, retrieves the corresponding stored URL
+// from the KV store, and sends a response with a redirect to the stored URL.
+//
+// Input: HTTP GET Request
+//   Query parameters:
+//   - 's'       Short string or alias returned by the URL Shorten function
+//
+// Output: HTTP Response
+//   On success:
+//   - HTTP response with an HTTP 301 redirect to the stored URL
+//   On failure:
+//   - HTTP response with a 4xx or 5xx HTTP status code and an error message
+//     in the body.
+//
+
 static const HttpStatusCode HTTP_STATUS_NO_CONTENT = 204;
 static const HttpStatusCode HTTP_STATUS_MOVED_PERMANENTLY = 301;
 static const HttpStatusCode HTTP_STATUS_BAD_REQUEST = 400;
@@ -63,7 +81,7 @@ std::optional<std::string> query_param_by_name(const HttpRequest & req, const st
                     break;
             }
         }
-        if (! name.empty() || ! value.empty()) {
+        if (!name.empty() || !value.empty()) {
             query_parsed.push_back(make_pair(name, value));
         }
 
@@ -97,12 +115,13 @@ HttpResponse serverless(const HttpRequest & req) {
 
     // Short string that represents a stored URL ("s" query parameter)
     std::optional<std::string> shortstr = query_param_by_name(req, "s");
-    if (! shortstr.has_value()) {
+    if (!shortstr.has_value()) {
         error("No key provided in user request");
         return HttpResponse("No key provided in user request")
             .set_status(HTTP_STATUS_BAD_REQUEST);
     }
 
+    // Retrieve the original URL from the KV store
     std::vector<uint8_t> record;
     KVError err = edjx::kv::get(record, shortstr.value());
     switch (err) {
@@ -119,6 +138,7 @@ HttpResponse serverless(const HttpRequest & req) {
             break;
     }
 
+    // Decode the KV entry
     Value value;
     if (!deserialize_value(value, record)) {
         error("Stored record is invalid");
@@ -126,7 +146,7 @@ HttpResponse serverless(const HttpRequest & req) {
                 .set_status(HTTP_STATUS_INTERNAL_SERVER_ERROR);
     }
 
-    // The stored URL
+    // Get the stored URL
     std::string url = value.url;
 
     return HttpResponse(url)
