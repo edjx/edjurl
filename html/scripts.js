@@ -1,13 +1,27 @@
 function sendRequest() {
-    const APP_URL = "https://5611543a-5ed7-458f-8014-11e19e0ddd12.fn.edjx.net/shorten";
-    const FETCH_PREFIX = "http://edjurl.com/?s=";
+    // Set APP_URL to the URL of the deployed "shorten" function.
+    // This function is called when the "Shorten" button
+    // is clicked on the web page.
+    //
+    // Example:
+    // const APP_URL = "https://5611543a-5ed7-458f-8014-11e19e0ddd12.fn.edjx.net/shorten";
+    const APP_URL = "https://APPID.fn.edjx.net/FUNCTION";
+
+    // Set FETCH_PREFIX to the URL of the deployed "fetch" function,
+    // followed by the query parameter. The FETCH_PREFIX string is displayed
+    // as a part of the short URL.
+    //
+    // Examples (before and after a domain is configured):
+    // const FETCH_PREFIX = "https://5611543a-5ed7-458f-8014-11e19e0ddd12.fn.edjx.net/fetch?s=";
+    // const FETCH_PREFIX = "http://edjurl.com/?s=";
+    const FETCH_PREFIX = "http://DOMAIN/?s=";
 
     var url = document.getElementById("url").value;
     var alias = document.getElementById("alias").value;
     var password = document.getElementById("password").value;
     var old_password = document.getElementById("old_password").value;
 
-    var params = {}
+    var params = {};
     if (url) {
         params.url = url;
     }
@@ -29,7 +43,6 @@ function sendRequest() {
         headers: headers,
     })
     .then((response) => {
-        //if (result.status != 200) { throw new Error("Bad response from server"); }
         status = response.status;
         return response.text();
     })
@@ -47,7 +60,7 @@ function sendRequest() {
             document.getElementById("div-result-error").style.display = "block";
             document.getElementById("button-copy-url").style.display = "none";
         }
-    })
+    });
 
     // Do not submit the form
     return false;
@@ -64,13 +77,9 @@ function copyURL() {
     copyText.select();
     copyText.setSelectionRange(0, 99999);
 
-    navigator.clipboard
-    .writeText(copyText.value)
-    // .then(() => {
-    //     alert("successfully copied");
-    // })
+    navigator.clipboard.writeText(copyText.value)
     .catch(() => {
-        alert("something went wrong");
+        alert("Copy to clipboard failed");
     });
 }
 
