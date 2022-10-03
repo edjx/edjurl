@@ -1,5 +1,5 @@
-use edjx::{error, info, kv, kv::KVError, HttpRequest, HttpResponse, StatusCode, HeaderValue};
-use crate::value_parser::{Value, deserialize_value};
+use crate::value_parser::{deserialize_value, Value};
+use edjx::{error, info, kv, kv::KVError, HeaderValue, HttpRequest, HttpResponse, StatusCode};
 
 pub fn serverless(req: HttpRequest) -> HttpResponse {
     info!("URL decoding function started");
@@ -8,9 +8,18 @@ pub fn serverless(req: HttpRequest) -> HttpResponse {
     if req.method() == &edjx::HttpMethod::OPTIONS {
         info!("Web browser sent an OPTIONS request. Responding with CORS data...");
         return HttpResponse::new()
-            //.set_header("Access-Control-Allow-Origin".parse().unwrap(), "*".parse().unwrap())
-            .set_header("Access-Control-Allow-Methods".parse().unwrap(), "GET".parse().unwrap())
-            .set_header("Access-Control-Allow-Headers".parse().unwrap(), "*".parse().unwrap())
+            // .set_header(
+            //     "Access-Control-Allow-Origin".parse().unwrap(),
+            //     "*".parse().unwrap()
+            // )
+            .set_header(
+                "Access-Control-Allow-Methods".parse().unwrap(),
+                "GET".parse().unwrap(),
+            )
+            .set_header(
+                "Access-Control-Allow-Headers".parse().unwrap(),
+                "*".parse().unwrap(),
+            )
             .set_status(StatusCode::NO_CONTENT);
     }
 
@@ -35,7 +44,7 @@ pub fn serverless(req: HttpRequest) -> HttpResponse {
             let status = match e {
                 KVError::Unknown => StatusCode::BAD_REQUEST,
                 KVError::UnAuthorized => StatusCode::UNAUTHORIZED,
-                KVError::NotFound  => StatusCode::NOT_FOUND,
+                KVError::NotFound => StatusCode::NOT_FOUND,
             };
             return HttpResponse::from(e.to_string()).set_status(status);
         }
@@ -55,7 +64,8 @@ pub fn serverless(req: HttpRequest) -> HttpResponse {
 
     HttpResponse::from(String::from(&url))
         .set_status(StatusCode::MOVED_PERMANENTLY)
-        .set_header("Location".parse().unwrap(), 
-            HeaderValue::from_str(&url).unwrap())
+        .set_header(
+            "Location".parse().unwrap(),
+            HeaderValue::from_str(&url).unwrap(),
+        )
 }
-

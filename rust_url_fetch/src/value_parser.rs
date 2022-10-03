@@ -100,5 +100,5 @@ pub fn deserialize_value(bytes: &Vec<u8>) -> Result<Value, DeserializeError> {
         return Err(DeserializeError::TooShort);
     }
 
-    return Ok(Value{url, password});
+    return Ok(Value { url, password });
 }
