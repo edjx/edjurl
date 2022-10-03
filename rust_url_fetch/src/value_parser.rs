@@ -11,7 +11,7 @@ pub enum DeserializeError {
     InternalError,
 }
 
-// Reconstruct Value from the serialized bytes, which looks like this:
+// Reconstruct Value from the serialized bytes, which look like this:
 // | URL_LENGTH | URL DATA | PASSWORD_LENGTH | PASSWORD_DATA |
 pub fn deserialize_value(bytes: &Vec<u8>) -> Result<Value, DeserializeError> {
     let mut url: String = String::new();
@@ -41,7 +41,7 @@ pub fn deserialize_value(bytes: &Vec<u8>) -> Result<Value, DeserializeError> {
             return Err(DeserializeError::TooLong);
         }
 
-        match &current_field {
+        match current_field {
             Field::Size => {
                 size_buf[size_buf_i] = *byte;
                 size_buf_i += 1;
@@ -53,6 +53,7 @@ pub fn deserialize_value(bytes: &Vec<u8>) -> Result<Value, DeserializeError> {
             }
             Field::Data => {
                 if size <= 0 {
+                    // This should not happen
                     return Err(DeserializeError::InternalError);
                 }
                 data.push(*byte);
@@ -64,18 +65,19 @@ pub fn deserialize_value(bytes: &Vec<u8>) -> Result<Value, DeserializeError> {
             if size <= 0 {
                 match current_member {
                     Member::Url => {
-                        url = String::from_utf8(data.clone()).unwrap();
+                        url = String::from_utf8(data).unwrap();
                         current_member = Member::Password;
                         current_field = Field::Size;
-                        data.clear();
+                        data = Vec::new();
                     }
                     Member::Password => {
-                        password = Some(String::from_utf8(data.clone()).unwrap());
+                        password = Some(String::from_utf8(data).unwrap());
                         current_member = Member::None;
                         current_field = Field::Size;
-                        data.clear();
+                        data = Vec::new();
                     }
                     _ => {
+                        // This should not happen
                         return Err(DeserializeError::InternalError);
                     }
                 }
