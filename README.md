@@ -36,10 +36,11 @@ The app consists of these components:
         - the `FETCH_PREFIX` variable to the URL of the deployed `fetch` function followed by the `?s=` query string (it will be displayed to the user).
     1. Create a new `edjurl` bucket in the EDJX Console.
     2. Upload all files from the [html](/html) folder to the new `edjurl` bucket.
-    3. In the EDJX Console, set the `Content-Disposition` header to the value `inline` for the `index.html` file, so that accessing the file URL in a web browser displays the HTML page instead of downloading it as a file.
+    3. In the EDJX Console, set the `Content-Disposition` header to the value `inline` for the `index.html` file so that accessing the file URL in a web browser displays the HTML page instead of downloading it as a file.
 3. Add a domain (optional):
     1. If you own a domain (e.g., `example.org`), you can add the domain to the EDJX Console.
-    2. You can set Request Routing rules in the EDJX Console, so that:
-        - `http://example.org` (exact match) redirects to the HTML page in the bucket `https://[BucketID].storage.edjx.net/blobs/index.html`
-        - `http://example.org/?s=*` (pattern match) redirects to `https://[AppID].fn.edjx.net/fetch?{query}`
-    3. If the domain is set up correctly, visiting `http://example.org` in a web browser will display the EdjURL home page. A shortened URL will look like this: `http://example.org/?s=SHORTSTRING`.
+    2. Add an SSL/TLS certificate in the domain settings in the EDJX Console in order to enable HTTPS traffic.
+    3. You can set Request Routing rules in the EDJX Console so that (in this order):
+        - `example.org/?s=*` (pattern match) redirects to `https://[AppID].fn.edjx.net/fetch?{query}`
+        - `example.org` (exact match) redirects to the HTML page in the bucket `https://[BucketID].storage.edjx.net/blobs/index.html`
+    4. If the domain is set up correctly, visiting `https://example.org` in a web browser will display the EdjURL home page. A shortened URL will look like this: `https://example.org/?s=SHORTSTRING`.

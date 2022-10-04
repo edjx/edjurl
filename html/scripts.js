@@ -13,8 +13,8 @@ function sendRequest() {
     //
     // Examples (before and after a domain is configured):
     // const FETCH_PREFIX = "https://5611543a-5ed7-458f-8014-11e19e0ddd12.fn.edjx.net/fetch?s=";
-    // const FETCH_PREFIX = "http://edjurl.com/?s=";
-    const FETCH_PREFIX = "http://DOMAIN/?s=";
+    // const FETCH_PREFIX = "https://edjurl.com/?s=";
+    const FETCH_PREFIX = "https://DOMAIN/?s=";
 
     var url = document.getElementById("url").value;
     var alias = document.getElementById("alias").value;
