@@ -13,7 +13,7 @@ use edjx::{error, info, kv, kv::KVError, HeaderValue, HttpRequest, HttpResponse,
 //
 // Output: HTTP Response
 //   On success:
-//   - HTTP response with an HTTP 301 redirect to the stored URL
+//   - HTTP response with an HTTP 302 redirect to the stored URL
 //   On failure:
 //   - HTTP response with a 4xx or 5xx HTTP status code and an error message
 //     in the body.
@@ -83,7 +83,7 @@ pub fn serverless(req: HttpRequest) -> HttpResponse {
     let url = value.url;
 
     HttpResponse::from(String::from(&url))
-        .set_status(StatusCode::MOVED_PERMANENTLY)
+        .set_status(StatusCode::FOUND)
         .set_header(
             "Location".parse().unwrap(),
             HeaderValue::from_str(&url).unwrap(),
