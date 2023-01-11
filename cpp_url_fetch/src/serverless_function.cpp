@@ -31,14 +31,14 @@ using edjx::http::HttpStatusCode;
 //
 // Output: HTTP Response
 //   On success:
-//   - HTTP response with an HTTP 301 redirect to the stored URL
+//   - HTTP response with an HTTP 307 redirect to the stored URL
 //   On failure:
 //   - HTTP response with a 4xx or 5xx HTTP status code and an error message
 //     in the body.
 //
 
 static const HttpStatusCode HTTP_STATUS_NO_CONTENT = 204;
-static const HttpStatusCode HTTP_STATUS_MOVED_PERMANENTLY = 301;
+static const HttpStatusCode HTTP_STATUS_TEMPORARY_REDIRECT = 302;
 static const HttpStatusCode HTTP_STATUS_BAD_REQUEST = 400;
 static const HttpStatusCode HTTP_STATUS_UNAUTHORIZED = 401;
 static const HttpStatusCode HTTP_STATUS_NOT_FOUND = 404;
@@ -150,6 +150,6 @@ HttpResponse serverless(const HttpRequest & req) {
     std::string url = value.url;
 
     return HttpResponse(url)
-        .set_status(HTTP_STATUS_MOVED_PERMANENTLY)
+        .set_status(HTTP_STATUS_TEMPORARY_REDIRECT)
         .set_header("Location", url);
 }
